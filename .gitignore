@@ -1,4 +1,5 @@
-./assignment_2/dataset
+# Ignore dataset (stored locally)
+dataset/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
