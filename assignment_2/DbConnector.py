@@ -1,5 +1,5 @@
 import mysql.connector as mysql
-import os
+from decouple import config
 
 
 class DbConnector:
@@ -16,10 +16,10 @@ class DbConnector:
     """
 
     def __init__(self,
-                 HOST=os.environ.get('HOST'),
-                 DATABASE=os.environ.get('DATABASE'),
-                 USER=os.environ.get('USER'),
-                 PASSWORD=os.environ.get('PASSWORD')):
+                 HOST=config('HOST'),
+                 DATABASE=config('DATABASE'),
+                 USER=config('USER'),
+                 PASSWORD=config('PASSWORD')):
         # Connect to the database
         try:
             self.db_connection = mysql.connect(host=HOST, database=DATABASE, user=USER, password=PASSWORD, port=3306)
