@@ -1,4 +1,4 @@
-from DbConnector import DbConnector
+from TDT4225.assignment_2.DbConnector import DbConnector
 from tabulate import tabulate
 
 

@@ -29,9 +29,12 @@ class Fetcher:
 
     # Main method: iterates file tree and inserts users, activities and trackpoints
     # Filters out trackpoints with more than 2500 lines (excluding headers)
-    def fetch_data(self):
+    def fetch_data(self, num_users=181):
         current_user = ''
+        iterations = 0  # Used for testing, iterates number of users indicated by num_users
         for root, dirs, files in os.walk("dataset"):
+            if iterations == num_users + 3:  # + 3 here because three first iterations are uninteresting files/dirs
+                break
             if "Trajectory" in dirs:
                 current_user = root[-3:]
                 print("Adding activities and trackpoints for user with id: {}".format(current_user))
@@ -45,6 +48,17 @@ class Fetcher:
                 for name in files:
                     activity_filepath = os.path.join(root, name)
                     self.add_activities_and_trackpoints_to_user(current_user, activity_filepath, name[:-4])
+            if files:
+                iterations += 1
+        return self.data
+
+    # Helper method for fetch_data
+    def add_labels_to_user(self, current_user, labels_filepath):
+        self.data[current_user]['labels'] = []
+        labels_file = open(labels_filepath, "r")
+        lines = labels_file.readlines()[1:]
+        for labeled_activity in lines:
+            self.data[current_user]['labels'].append(labeled_activity.strip().split("\t"))
 
     # Helper method for fetch_data
     def add_activities_and_trackpoints_to_user(self, current_user, activity_filepath, activity_id):
@@ -59,22 +73,14 @@ class Fetcher:
 
             self.data[current_user][activity_id].append(trackpoint.strip().split("\t"))
 
-    # Helper method for fetch_data
-    def add_labels_to_user(self, current_user, labels_filepath):
-        self.data[current_user]['labels'] = []
-        labels_file = open(labels_filepath, "r")
-        lines = labels_file.readlines()[1:]
-        for labeled_activity in lines:
-            self.data[current_user]['labels'].append(labeled_activity.strip().split("\t"))
-
     def get_data(self):
         return self.data
 
 
 def main():
     fetcher = Fetcher()
-    fetcher.fetch_data()
-    pprint.pp(fetcher.get_data())
+    fetcher.fetch_data(2)
+    # pprint.pp(fetcher.get_data())
 
 
 if __name__ == '__main__':
