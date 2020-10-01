@@ -142,6 +142,7 @@ class DBInserter:
         for user in self.data:
             has_labels = 1 if 'labels' in self.data[user] else 0
             self.insert_user(user, has_labels)
+            print("Inserting activities for user with id: {}".format(user))
             for activity in self.data[user]:
                 self.insert_activity(user, activity, has_labels)
 
@@ -198,14 +199,15 @@ class DBInserter:
 
 def main():
     fetcher = Fetcher()
-    data_set = fetcher.fetch_data(100)  # Fetches data from approximately 100 users
+    data_set = fetcher.fetch_data(0)  # Fetches data from approximately 100 users
     try:
         table_creator = DBTables()
-        table_creator.drop_all_tables()
-        table_creator.create_all_tables()
+        # table_creator.drop_all_tables()
+        # table_creator.create_all_tables()
 
         data_inserter = DBInserter(data_set)
-        data_inserter.insert_data()
+        query = "SELECT * FROM Users"
+        data_inserter.execute_query("Users", query)
 
 
 
