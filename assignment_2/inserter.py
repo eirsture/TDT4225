@@ -77,7 +77,10 @@ class DBInserter:
     def determine_transportation(self, user, start_date_time, end_date_time):
         labeled_activities = self.labels[user]
         for activity in labeled_activities:
-            if activity[0] == start_date_time and activity[1] == end_date_time:
-                return activity[2]
+            label_activity_start = activity[0]
+            label_activity_end = activity[1]
+            transportation_mode = activity[2]
+            if label_activity_start == start_date_time and label_activity_end == end_date_time:
+                return transportation_mode
         return 'NULL'
 

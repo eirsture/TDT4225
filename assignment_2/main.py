@@ -5,16 +5,16 @@ from TDT4225.assignment_2.querier import DBQuerier
 
 
 def main():
-    # fetcher = Fetcher()
-    # data_set, labels = fetcher.fetch_data(30)  # Fetches data from approximately 30 users
+    fetcher = Fetcher()
+    data_set, labels = fetcher.fetch_data(15)  # Fetches data from approximately 30 users
     data_querier = None
     try:
-        # table_creator = DBTablesCreator()
-        # table_creator.drop_all_tables()
-        # table_creator.create_all_tables()
+        table_creator = DBTablesCreator()
+        table_creator.drop_all_tables()
+        table_creator.create_all_tables()
 
-        # data_inserter = DBInserter(data_set, labels)
-        # data_inserter.insert_data()
+        data_inserter = DBInserter(data_set, labels)
+        data_inserter.insert_data()
 
         data_querier = DBQuerier()
         select_users = "SELECT * FROM Users"
@@ -27,8 +27,8 @@ def main():
     finally:
         if data_querier:
             data_querier.connection.close_connection()
-        # table_creator.connection.close_connection()
-        # data_inserter.connection.close_connection()
+        table_creator.connection.close_connection()
+        data_inserter.connection.close_connection()
 
 
 if __name__ == '__main__':
