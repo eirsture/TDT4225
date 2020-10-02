@@ -5,44 +5,38 @@ import os
         self.data:
             {
                 000: (user_id)
-                    20081023025304: (activity_id, "plt file name")
+                    1: (activity_id, "plt file name")
                         [<activity start datetime>, <activity end datetime>, 
                             [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
-                    20081024020959:
+                    2:
                         [<activity start datetime>, <activity end datetime>, 
                             [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
                     ...
                 001: (user_id)
                     ...
                 ...
-                010: (userid) <this user has a label>
-                    'labels': [[label 1], [label 2], ..., [label N]]
-                    20081023025304: (activity_id, "plt file name")
-                        [<activity start datetime>, <activity end datetime>, 
-                            [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
-                    20081024020959:
-                        [<activity start datetime>, <activity end datetime>, 
-                            [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
-                    ...
-                011: (user_id)
-                    20081023025304: (activity_id, "plt file name")
-                        [<activity start datetime>, <activity end datetime>, 
-                            [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
-                    20081024020959:
-                        [<activity start datetime>, <activity end datetime>, 
-                            [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
-                    ...
-                ...
                 181: (user_id)
                     ...
             }
             
-        label example:
-            ['2007/06/26 11:32:29', '2007/06/26 11:40:29', 'bus']
-            
         trackpoint example:
             ['40.127951', '116.48646', '0', '62', '39969.065474537', '2009-06-05', '01:34:17']
 
+
+
+        self.labels: (see txt file labeled_ids for more info)
+            {
+                010:
+                    [[label 1], [label 2], ..., [label N]]
+                020:
+                    [[label 1], [label 2], ..., [label N]]
+                ...
+                179:
+                    [[label 1], [label 2], ..., [label N]]
+            }
+            
+        label example:
+            ['2007/06/26 11:32:29', '2007/06/26 11:40:29', 'bus']
 """
 
 
@@ -50,6 +44,7 @@ class Fetcher:
 
     def __init__(self):
         self.data = {}
+        self.labels = {}
 
     # Main method: iterates file tree and inserts users, activities and trackpoints
     # Filters out trackpoints with more than 2500 lines (excluding headers)
@@ -77,15 +72,15 @@ class Fetcher:
                     self.add_activities_and_trackpoints_to_user(user_id, activity_filepath, activity_id)
             if files:
                 iterations += 1
-        return self.data
+        return self.data, self.labels
 
-    # Helper method for fetch_data
+    # Adds label to user in self.labels, key is user id
     def add_labels_to_user(self, current_user, labels_filepath):
-        self.data[current_user]['labels'] = []
+        self.labels[current_user] = []
         labels_file = open(labels_filepath, "r")
         lines = labels_file.readlines()[1:]
         for labeled_activity in lines:
-            self.data[current_user]['labels'].append(labeled_activity.strip().split("\t"))
+            self.labels[current_user].append(labeled_activity.strip().split("\t"))
 
     # Helper method for fetch_data
     def add_activities_and_trackpoints_to_user(self, user_id, activity_filepath, activity_id):
@@ -112,9 +107,6 @@ class Fetcher:
         for trackpoint in trackpoints:
             trackpoint_attributes = trackpoint.strip().split(",")
             self.data[user_id][activity_id].append(trackpoint_attributes)
-
-    def get_data(self):
-        return self.data
 
 
 def main():
