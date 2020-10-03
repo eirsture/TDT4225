@@ -54,7 +54,9 @@ class DBTablesCreator:
                     (
                         id INT AUTO_INCREMENT NOT NULL,
                         activity_id INT NOT NULL,
-                        lat DOUBLE,
+                        lat DOUBLE NOT NULL,
+                        lon DOUBLE NOT NULL,
+                        altitude INT,
                         date_days DOUBLE NOT NULL,
                         date_time DATETIME NOT NULL,
                         PRIMARY KEY (id),

@@ -6,10 +6,10 @@ from TDT4225.assignment_2.DbConnector import DbConnector
             {
                 000: (user_id)
                     1: (activity_id, "plt file name")
-                        [<activity start datetime>, <activity end datetime>, 
+                        [<activity start datetime>, <activity end datetime>, <transportation_mode>
                             [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
                     2:
-                        [<activity start datetime>, <activity end datetime>, 
+                        [<activity start datetime>, <activity end datetime>, <transportation_mode> 
                             [trackpoint 1], [trackpoint 2], ..., [trackpoint N]]
                     ...
                 001: (user_id)
@@ -18,9 +18,9 @@ from TDT4225.assignment_2.DbConnector import DbConnector
                 181: (user_id)
                     ...
             }
-
+            
         trackpoint example:
-            ['40.127951', '116.48646', '0', '62', '39969.065474537', '2009-06-05', '01:34:17']
+            ['40.127951', '116.48646', '62', '39969.065474537', '2009-06-05 01:34:17']
 
 
 
@@ -34,9 +34,9 @@ from TDT4225.assignment_2.DbConnector import DbConnector
                 179:
                     [[label 1], [label 2], ..., [label N]]
             }
-
+            
         label example:
-            ['2007/06/26 11:32:29', '2007/06/26 11:40:29', 'bus']
+            ['2007-06-26 11:32:29', '2007-06-26 11:40:29', 'bus']
 """
 
 
@@ -56,31 +56,33 @@ class DBInserter:
             self.insert_user(user, has_labels)
             print("Inserting activities for user with id: {}".format(user))
             for activity in self.data[user]:
-                self.insert_activity(user, activity, has_labels)
+                self.insert_activity(user, activity)
+                print("\tInserting trackpoints for activity with id: {}".format(activity))
+                self.insert_trackpoints(user, activity)
 
     def insert_user(self, user, has_labels):
         query = "INSERT INTO Users VALUES ('{}',{})".format(user, has_labels)
         self.cursor.execute(query)
         self.db_connection.commit()
 
-    def insert_activity(self, user, activity, has_labels):
-        transportation_mode = 'NULL'
+    def insert_activity(self, user, activity):
         start_date_time = self.data[user][activity][0]
         end_date_time = self.data[user][activity][1]
-        if has_labels:
-            transportation_mode = self.determine_transportation(user, start_date_time, end_date_time)
+        transportation_mode = self.data[user][activity][2]
         query = "INSERT INTO Activities VALUES ('{}','{}',{},'{}','{}')"\
             .format(activity, user, transportation_mode, start_date_time, end_date_time)
         self.cursor.execute(query)
         self.db_connection.commit()
 
-    def determine_transportation(self, user, start_date_time, end_date_time):
-        labeled_activities = self.labels[user]
-        for activity in labeled_activities:
-            label_activity_start = activity[0]
-            label_activity_end = activity[1]
-            transportation_mode = activity[2]
-            if label_activity_start == start_date_time and label_activity_end == end_date_time:
-                return transportation_mode
-        return 'NULL'
+    def insert_trackpoints(self, user, activity):
+        trackpoints = self.data[user][activity][3:]
+        for trackpoint in trackpoints:
+            lat, lon, altitude = trackpoint[0], trackpoint[1], trackpoint[2]
+            date_days, date_time = trackpoint[3], trackpoint[4]
+            query = """
+                    INSERT INTO Trackpoints (activity_id, lat, lon, altitude, date_days, date_time)
+                    VALUES ('{}', '{}', '{}', '{}', '{}', '{}')
+                    """.format(activity, lat, lon, altitude, date_days, date_time)
+            self.cursor.execute(query)
+            self.db_connection.commit()
 
