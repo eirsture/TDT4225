@@ -1,4 +1,4 @@
-from TDT4225.assignment_2.DbConnector import DbConnector
+from dbConnector import DbConnector
 from tabulate import tabulate
 
 
@@ -21,8 +21,6 @@ class DBQuerier:
         self.cursor.execute(query)
         self.db_connection.commit()
         print("Deleted data from table {}".format(table))
-
-
 
     def drop_table(self, table_name):
         print("Dropping table %s..." % table_name)

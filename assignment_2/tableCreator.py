@@ -1,4 +1,4 @@
-from TDT4225.assignment_2.DbConnector import DbConnector
+from dbConnector import DbConnector
 
 
 class DBTablesCreator:

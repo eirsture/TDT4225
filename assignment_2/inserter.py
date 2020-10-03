@@ -1,4 +1,4 @@
-from TDT4225.assignment_2.DbConnector import DbConnector
+from dbConnector import DbConnector
 
 """
     Data structure:
@@ -57,7 +57,6 @@ class DBInserter:
             print("Inserting activities for user with id: {}".format(user))
             for activity in self.data[user]:
                 self.insert_activity(user, activity)
-                print("\tInserting trackpoints for activity with id: {}".format(activity))
                 self.insert_trackpoints(user, activity)
 
     def insert_user(self, user, has_labels):
@@ -76,13 +75,15 @@ class DBInserter:
 
     def insert_trackpoints(self, user, activity):
         trackpoints = self.data[user][activity][3:]
+        query = "INSERT INTO Trackpoints (activity_id, lat, lon, altitude, date_days, date_time) VALUES "
+
+        # Build SQL query so that we only do one insert with a lot of rows
         for trackpoint in trackpoints:
             lat, lon, altitude = trackpoint[0], trackpoint[1], trackpoint[2]
             date_days, date_time = trackpoint[3], trackpoint[4]
-            query = """
-                    INSERT INTO Trackpoints (activity_id, lat, lon, altitude, date_days, date_time)
-                    VALUES ('{}', '{}', '{}', '{}', '{}', '{}')
-                    """.format(activity, lat, lon, altitude, date_days, date_time)
-            self.cursor.execute(query)
-            self.db_connection.commit()
+            query += "('{}', '{}', '{}', '{}', '{}', '{}'),"\
+                .format(activity, lat, lon, altitude, date_days, date_time)
+        final_query = query[:-1]
+        self.cursor.execute(final_query)
+        self.db_connection.commit()
 
