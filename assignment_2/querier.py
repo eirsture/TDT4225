@@ -14,7 +14,8 @@ class DBQuerier:
         rows = self.cursor.fetchall()
 
         # Using tabulate to show the table in a nice way
-        print("Data from table {}, tabulated:".format(table))
+        print("Data from table {}:".format(table))
+        print()
         print(tabulate(rows, headers=self.cursor.column_names))
 
     # Task 1
