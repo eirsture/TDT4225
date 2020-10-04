@@ -17,13 +17,13 @@ class DBQuerier:
         print("Data from table {}, tabulated:".format(table))
         print(tabulate(rows, headers=self.cursor.column_names))
 
-    def execute_delete_query(self, table, query):
-        self.cursor.execute(query)
-        self.db_connection.commit()
-        print("Deleted data from table {}".format(table))
+    # def execute_delete_query(self, table, query):
+    #     self.cursor.execute(query)
+    #     self.db_connection.commit()
+    #     print("Deleted data from table {}".format(table))
 
-    def drop_table(self, table_name):
-        print("Dropping table %s..." % table_name)
-        query = "DROP TABLE %s"
-        self.cursor.execute(query % table_name)
-        self.db_connection.commit()
+    # def drop_table(self, table_name):
+    #     print("Dropping table %s..." % table_name)
+    #     query = "DROP TABLE %s"
+    #     self.cursor.execute(query % table_name)
+    #     self.db_connection.commit()
