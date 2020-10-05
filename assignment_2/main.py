@@ -8,14 +8,7 @@ def main():
 
     try:
         data_querier = DBQuerier()
-        select_users = "SELECT * FROM Users"
-        # select_some_activities = "SELECT * FROM Activities WHERE transportation_mode IS NOT NULL"
-        # select_some_trackpoints = "SELECT * FROM Trackpoints WHERE id < 20"
-        data_querier.execute_display_query('Users', select_users)
-        # data_querier.execute_display_query('Activities', select_some_activities)
-        # data_querier.execute_display_query('Trackpoints', select_some_trackpoints)
-        # delete_035 = "DELETE FROM Users WHERE id='035'"
-        # data_querier.execute_delete_query('Users', delete_035)
+        data_querier.find_invalid_activities()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
@@ -26,12 +19,7 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-
-
-
-
-    """ Can be inserted to main if you want to tear down and build up the database again
+    """ The following below can be inserted to main if you want to tear down and build up the database again
         especially be careful with dropping the tables"""
 
     # fetcher = Fetcher()
