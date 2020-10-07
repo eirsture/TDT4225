@@ -33,8 +33,7 @@ class DBQuerier:
         rows_a = self.cursor.fetchall()
         print("6 a) The year with the most activities")
         print(tabulate(rows_a, headers=self.cursor.column_names), "\n\n")
-
-        query_b = "SELECT YEAR(start_date_time), SUM(end_date_time - start_date_time) as recorded_hours FROM Activities GROUP BY YEAR(start_date_time) ORDER BY recorded_hours DESC LIMIT 1"
+        query_b = "Select YEAR(start_date_time) as year, SUM(TIMEDIFF(end_date_time, start_date_time))/3600 as recorded_hours FROM Activities GROUP BY year ORDER BY recorded_hours DESC LIMIT 1"
         self.cursor.execute(query_b)
         rows_b = self.cursor.fetchall()
         print("6 b) The year with the most recorded hours")
