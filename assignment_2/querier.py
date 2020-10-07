@@ -45,14 +45,6 @@ class DBQuerier:
             print("As you can see was " + str(rows_a[0][0]) + " the year with most activities, while " + str(rows_b[0][0]) + " was the year with the most recorded hours.")
 
 
-
-    def task11(self):
-        query = "SELECT id FROM Users WHERE has_labels=TRUE"
-        self.cursor.execute(query)
-        rows = self.cursor.fetchall()
-        print("6 a) The year with the most activities and number of")
-        print(tabulate(rows, headers=self.cursor.column_names))
-
     # def execute_delete_query(self, table, query):
     #     self.cursor.execute(query)
     #     self.db_connection.commit()
