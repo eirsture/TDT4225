@@ -52,6 +52,33 @@ class DBQuerier:
         print("4) Users who have taken taxi")
         print(tabulate(rows, headers=self.cursor.column_names))
         return rows
+    
+    # Task 5
+    def task5(self):
+
+        query = "SELECT transportation_mode, COUNT(transportation_mode) as number_of FROM Activities WHERE transportation_mode IS NOT NULL GROUP BY(transportation_mode);"
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        print("5) Transportation mode and number of activities of that transportation mode")
+        print(tabulate(rows, headers=self.cursor.column_names))
+    
+    # Task 6
+    def task6(self):
+        """ Didn't get MAX() to work so did as suggested by: https://stackoverflow.com/a/16133099 """
+        query_a = "SELECT YEAR(start_date_time) as year, COUNT(*) as number_of FROM Activities GROUP BY YEAR(start_date_time) ORDER BY number_of DESC LIMIT 1"
+        self.cursor.execute(query_a)
+        rows_a = self.cursor.fetchall()
+        print("6 a) The year with the most activities")
+        print(tabulate(rows_a, headers=self.cursor.column_names), "\n\n")
+        query_b = "Select YEAR(start_date_time) as year, SUM(TIMEDIFF(end_date_time, start_date_time))/3600 as recorded_hours FROM Activities GROUP BY year ORDER BY recorded_hours DESC LIMIT 1"
+        self.cursor.execute(query_b)
+        rows_b = self.cursor.fetchall()
+        print("6 b) The year with the most recorded hours")
+        print(tabulate(rows_b, headers=self.cursor.column_names), "\n\n")
+        if (rows_a[0][0] == rows_b[0][0]):
+            print("As you can see was " + str(rows_a[0][0]) + " both the year with most activities and the most recorded hours.")
+        else:
+            print("As you can see was " + str(rows_a[0][0]) + " the year with most activities, while " + str(rows_b[0][0]) + " was the year with the most recorded hours.")
 
     # Task 10
     # Slow
