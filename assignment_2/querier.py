@@ -27,7 +27,6 @@ class DBQuerier:
 
     def task6(self):
         """ Didn't get MAX() to work so did as suggested by: https://stackoverflow.com/a/16133099 """
-        "SELECT YEAR(start_date_time) as year, COUNT(*) as number_of FROM Activities GROUP BY YEAR(start_date_time) ORDER BY number_of DESC LIMIT 1"
         query_a = "SELECT YEAR(start_date_time) as year, COUNT(*) as number_of FROM Activities GROUP BY YEAR(start_date_time) ORDER BY number_of DESC LIMIT 1"
         self.cursor.execute(query_a)
         rows_a = self.cursor.fetchall()
@@ -43,14 +42,6 @@ class DBQuerier:
         else:
             print("As you can see was " + str(rows_a[0][0]) + " the year with most activities, while " + str(rows_b[0][0]) + " was the year with the most recorded hours.")
 
-
-
-    def task11(self):
-        query = "SELECT id FROM Users WHERE has_labels=TRUE"
-        self.cursor.execute(query)
-        rows = self.cursor.fetchall()
-        print("6 a) The year with the most activities and number of")
-        print(tabulate(rows, headers=self.cursor.column_names))
 
     # def execute_delete_query(self, table, query):
     #     self.cursor.execute(query)
