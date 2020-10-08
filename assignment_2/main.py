@@ -8,7 +8,7 @@ def main():
 
     try:
         data_querier = DBQuerier()
-        data_querier.find_invalid_activities()
+        data_querier.find_most_used_transportation()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)

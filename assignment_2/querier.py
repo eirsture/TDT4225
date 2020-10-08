@@ -57,3 +57,40 @@ class DBQuerier:
         print("\n9)All users who have invalid activities, and the number of invalid activities per user")
         print(tabulate(users_pretty, headers=("user id", "invalid activities")))
 
+        """
+        11. Find all users who have registered transportation_mode and their most used transportation_mode. 
+            ○ The answer should be on format(user_id, most_used_transportation_mode) sorted on user_id. 
+            ○ Some users may have the same number of activities tagged with e.g.walk and car.
+                In this case it is up to you to decide which transportation mode to include in your answer(choose one). 
+            ○ Do not count the rows where the mode is null.
+        """
+
+    def find_most_used_transportation(self):
+        query = """
+                SELECT 
+                    a.user_id AS uid,
+                    a.transportation_mode AS t_mode,
+                    COUNT(a.transportation_mode) AS counted        
+                FROM 
+                    Activities a
+                INNER JOIN Users u
+                    ON a.user_id = u.id AND u.has_labels = 1 AND a.transportation_mode IS NOT NULL 
+                GROUP BY uid, t_mode
+                ORDER BY uid, counted DESC 
+                """
+
+        self.cursor.execute(query)
+        user_transportation_data = self.cursor.fetchall()
+
+        data = {}
+        for user_data in user_transportation_data:
+            user_id = user_data[0]
+            transportation_mode = user_data[1]
+            if user_id not in data:
+                data[user_id] = transportation_mode
+
+        data_pretty = list(data.items())
+        print("\n11) All users who have registered transportation_mode and their most used transportation_mode.")
+        print(tabulate(data_pretty, headers=("user id", "most used transportation")))
+
+
