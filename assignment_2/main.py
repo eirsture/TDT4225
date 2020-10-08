@@ -8,17 +8,6 @@ def main():
 
     try:
         data_querier = DBQuerier()
-        # select_users = "SELECT * FROM Users LIMIT 10"
-        # select_activities = "SELECT * FROM Activities LIMIT 10"
-        # select_trackpoints = "SELECT * FROM Trackpoints LIMIT 10"
-        # select_some_activities = "SELECT * FROM Activities WHERE transportation_mode IS NOT NULL"
-        # select_some_trackpoints = "SELECT * FROM Trackpoints WHERE id < 20"
-        # data_querier.execute_display_query('Users', select_users)
-        # data_querier.execute_display_query('Activities', select_activities)
-        # data_querier.execute_display_query('Trackpoints', select_trackpoints)
-        # delete_035 = "DELETE FROM Users WHERE id='035'"
-        # data_querier.execute_delete_query('Users', delete_035)
-
         # Task 1
         # print("1) Number of users: ", data_querier.countRows("Users"))
         # print("1) Number of activities: ", data_querier.countRows("Activities"))
@@ -32,9 +21,27 @@ def main():
 
         # Task 4
         # data_querier.getUsersTakingTaxi()
+        
+        # Task 5
+        # data_querier.task5()
+        
+        # Task 6
+        # data_querier.task6()
+        
+        # Task 7
+        # data_querier.total_distance_walked()
+        
+        # Task 8
+        # data_querier.top_gained_altitude()
+        
+        # Task 9
+        # data_querier.find_invalid_activities()
 
         # Task 10
         # data_querier.getUsersInForbiddenCity()
+        
+        # Task 11
+        # data_querier.find_most_used_transportation()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
@@ -45,8 +52,7 @@ def main():
 if __name__ == '__main__':
     main()
 
-    """ Can be inserted to main if you want to tear down and build up the database again
-        especially be careful with dropping the tables"""
+    """ The following below can be inserted to main if you want to tear down and build up the database again """
 
     # fetcher = Fetcher()
     # data_set, labels = fetcher.fetch_data()
