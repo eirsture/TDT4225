@@ -1,0 +1,4 @@
+haversine==2.2.0
+pymongo==3.11.0
+python-decouple==3.3
+tabulate==0.8.7
