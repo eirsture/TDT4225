@@ -103,7 +103,7 @@ class Fetcher:
         end_time = trackpoints[len(trackpoints)-1].strip().split(",")[6]
         end_date_time = "{} {}".format(end_date, end_time)
 
-        transportation_mode = 'NULL'
+        transportation_mode = None
         if user_id in self.labels:
             transportation_mode = self.determine_transportation(
                 user_id, start_date_time, end_date_time)
