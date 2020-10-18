@@ -48,13 +48,13 @@ class Fetcher:
 
     # Main method: iterates file tree and inserts users, activities and trackpoints
     # Filters out trackpoints with more than 2500 lines (excluding headers)
-    def fetch_data(self, num_users):
+    def fetch_data(self):
         user_id = ''
         activity_id = 0
-        iterations = 0  # num_user is unstable, will give some deterministic number of users close to num_users
+        # iterations = 0  # num_user is unstable, will give some deterministic number of users close to num_users
         for root, dirs, files in os.walk("dataset"):
-            if iterations == num_users + 3:  # + 3 here because three first iterations are uninteresting files/dirs
-                break
+            #if iterations == num_users + 3:  # + 3 here because three first iterations are uninteresting files/dirs
+            #    break
             if "Trajectory" in dirs:
                 user_id = root[-3:]
                 print("Fetching activities and trackpoints for user with id: {}".format(user_id))
@@ -69,8 +69,8 @@ class Fetcher:
                 for activity in files:
                     activity_filepath = os.path.join(root, activity)
                     activity_id += self.add_activities_and_trackpoints_to_user(user_id, activity_filepath, activity_id)
-            if files:
-                iterations += 1
+            #if files:
+            #    iterations += 1
         return self.data, self.labels
 
     # Adds label to user in self.labels, key is user id
