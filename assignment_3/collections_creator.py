@@ -1,4 +1,5 @@
 from db_connector import DbConnector
+from decouple import config
 
 class CollectionsCreator:
 
@@ -20,17 +21,9 @@ class CollectionsCreator:
     def drop_all_collections(self):
         collections = [self.db[i] for i in self.collection_names]
         for coll in collections:
-            self.drop_collection(coll)
-
-    def drop_collection(self, collection_name):
-        collection = self.db[collection_name]
-        collection.drop()
-        print("Dropped collection: ", collection)
+            coll.drop()
+            print("Dropped collection: ", coll)
 
     def show_collections(self):
-        collections = [self.client[i].list_collection_names() for i in self.collection_names]
-        print(collections)
-
-    def show_coll(self, name):
-        collections = self.client[name].list_collection_names()
+        collections = self.client[config('DATABASE')].list_collection_names()
         print(collections)
