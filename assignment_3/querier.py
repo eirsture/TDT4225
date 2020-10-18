@@ -49,3 +49,15 @@ class DBQuerier:
 
         for doc in documents: 
             pprint(doc)
+
+    def q4(self):
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$match": {"transportation_mode": {"$eq":"'taxi'"}}},
+            {"$group": {"_id":"$user"}},
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents:
+            pprint(doc)
