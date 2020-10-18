@@ -1,13 +1,32 @@
 from collections_creator import CollectionsCreator
 from fetcher import Fetcher
 from inserter import DBInserter
-
+from querier import DBQuerier
 
 def main():
-    """
+    program = None
+
+    try:
+        program = DBQuerier()
+        program.q3()
+
+    except Exception as e:
+        print("ERROR: Failed to use database:", e)
+    finally:
+        if program:
+            program.connection.close_connection()
+    
+
+if __name__ == '__main__':
+    main()
+
+
+"""
     # The following below can be inserted to main if you want to tear down and build up the database again
     creator = None
+    
     program = None
+    
     fetcher = Fetcher()
     data_set, labels = fetcher.fetch_data()
     try:
@@ -18,6 +37,10 @@ def main():
         creator.show_collections()
         program = DBInserter(data_set, labels)
         program.insert_data()
+    data_set, labels = fetcher.fetch_data(3)
+    print(data_set)
+    print(labels)
+    
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
@@ -27,7 +50,3 @@ def main():
         if program:
             program.connection.close_connection()
     """
-
-if __name__ == '__main__':
-    main()
-
