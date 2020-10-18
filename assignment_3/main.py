@@ -4,25 +4,29 @@ from inserter import DBInserter
 
 
 def main():
+    """
+    # The following below can be inserted to main if you want to tear down and build up the database again
+    creator = None
     program = None
     fetcher = Fetcher()
-    data_set, labels = fetcher.fetch_data(3)
+    data_set, labels = fetcher.fetch_data()
     try:
-        #program = CollectionsCreator()
-        #program.create_all_collections()
-        #program.show_coll()
+        creator = CollectionsCreator()
+        creator.drop_all_collections()
+        creator.create_all_collections()
+
+        creator.show_collections()
         program = DBInserter(data_set, labels)
         program.insert_data()
-        program.fetch_documents("User")
-        program.fetch_documents("Activity")
-
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
     finally:
+        if creator:
+            creator.connection.close_connection()
         if program:
             program.connection.close_connection()
-
+    """
 
 if __name__ == '__main__':
     main()
