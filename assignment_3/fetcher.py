@@ -123,7 +123,7 @@ class Fetcher:
             label_activity_end = activity[1]
             transportation_mode = activity[2]
             if label_activity_start == start_date_time and label_activity_end == end_date_time:
-                return "'{}'".format(transportation_mode)  # Double string needed for insertion to SQL statement
+                return "{}".format(transportation_mode)
         return 'NULL'
 
     def add_trackpoint_to_activity(self, user_id, activity_id, trackpoint):
