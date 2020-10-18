@@ -124,7 +124,7 @@ class Fetcher:
             transportation_mode = activity[2]
             if label_activity_start == start_date_time and label_activity_end == end_date_time:
                 return "{}".format(transportation_mode)
-        return 'NULL'
+        return None
 
     def add_trackpoint_to_activity(self, user_id, activity_id, trackpoint):
         trckpnt_attr = trackpoint.strip().split(",")  # Trackpoint attributes
