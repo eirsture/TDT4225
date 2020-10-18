@@ -49,3 +49,33 @@ class DBQuerier:
 
         for doc in documents: 
             pprint(doc)
+
+    def q6a(self):
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            { "$group": { "_id": {"$year": "$start_date_time"}, "NumberOfActivities": { "$sum": 1 }}},
+		    { "$sort": { "NumberOfActivities": -1 } },
+            { "$limit": 20 }
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents: 
+            pprint(doc)
+
+    def q6b(self):
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$project": { "DifferenceInHours": {"$divide": [{"$subtract": ["$end_date_time", "$start_date_time"]}, 3600000]}}},
+            { "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": "DifferenceInHours" }}}
+            
+            #{"$group": {"_id": None, "diff": {"$subtract": ["$end_date_time", "$start_date_time"] }}}
+            #{ "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": 1 }}}
+		    #{ "$sort": { "recorded_hours": -1 } },
+            #{ "$limit": 20 }
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents: 
+            pprint(doc)
