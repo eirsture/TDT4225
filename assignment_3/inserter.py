@@ -1,4 +1,5 @@
-from dbConnector import DbConnector
+from db_connector import DbConnector
+from pprint import pprint
 
 """
     Data structure:
@@ -45,25 +46,28 @@ class DBInserter:
     # Takes in dictionary for all user/activity/trackpoint data and label dictionary linked to users
     def __init__(self, data, labels):
         self.connection = DbConnector()
-        self.db_connection = self.connection.db_connection
-        self.cursor = self.connection.cursor
+        self.client = self.connection.client
+        self.db = self.connection.db
         self.data = data
         self.labels = labels
         self.users = []
         self.activities = []
         self.trackpoints = []
+        self.trackpoint_id = 0
 
-    def prepare_users(self):
-        trackpoint_id = 0
+    def prepare_data(self):
+
         for user in self.data:
+            print("Preparing for user: ", user)
             has_labels = 1 if user in self.labels else 0
             self.users.append({"_id": user, "has_labels": has_labels})
 
             for activity in self.data[user]:
-                self.prepare_activities(activity, user)
-                trackpoint_id = self.prepare_trackpoints(user, activity, trackpoint_id)
+                self.prepare_activities(user, activity)
+                self.prepare_trackpoints(user, activity)
 
     def prepare_activities(self, user, activity):
+        print("Preparing for activity: ", activity)
         start_date_time = self.data[user][activity][0]
         end_date_time = self.data[user][activity][1]
         transportation_mode = self.data[user][activity][2]
@@ -75,14 +79,13 @@ class DBInserter:
             "end_date_time": end_date_time
         })
 
-    def prepare_trackpoint(self, user, activity, trackpoint_id):
+    def prepare_trackpoints(self, user, activity):
         trackpoints = self.data[user][activity][3:]
-
         for trackpoint in trackpoints:
             lat, lon, altitude = trackpoint[0], trackpoint[1], trackpoint[2]
             date_days, date_time = trackpoint[3], trackpoint[4]
             self.trackpoints.append({
-                "_id": trackpoint_id,
+                "_id": self.trackpoint_id,
                 "activity_id": activity,
                 "lat": lat,
                 "lon": lon,
@@ -91,23 +94,37 @@ class DBInserter:
                 "date_time": date_time
 
             })
-            trackpoint_id += 1
-        return trackpoint_id
+            self.trackpoint_id += 1
 
     def insert_data(self):
+        self.prepare_data()
+        print("Prepared users: ", self.users)
+        print("Prepared users count: ", len(self.users))
+        print("Prepared activities count: ", len(self.activities))
+        print("Prepared trackpoints count: ", len(self.trackpoints))
+
         self.insert_user()
         self.insert_activity()
         self.insert_trackpoints()
 
     def insert_user(self):
+        print("Inserting users")
         collection = self.db["User"]
         collection.insert_many(self.users)
 
     def insert_activity(self):
+        print("Inserting activities")
         collection = self.db["Activity"]
         collection.insert_many(self.activities)
 
     def insert_trackpoints(self):
+        print("Inserting trackpoints")
         collection = self.db["Trackpoint"]
         collection.insert_many(self.trackpoints)
+
+    def fetch_documents(self, collection_name):
+        collection = self.db[collection_name]
+        documents = collection.find({})
+        for doc in documents:
+            pprint(doc)
 
