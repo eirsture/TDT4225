@@ -1,4 +1,5 @@
 from db_connector import DbConnector
+from datetime import datetime
 from pprint import pprint
 
 """
@@ -59,7 +60,7 @@ class DBInserter:
 
         for user in self.data:
             print("Preparing for user: ", user)
-            has_labels = 1 if user in self.labels else 0
+            has_labels = True if user in self.labels else False
             self.users.append({"_id": user, "has_labels": has_labels})
 
             for activity in self.data[user]:
@@ -67,7 +68,6 @@ class DBInserter:
                 self.prepare_trackpoints(user, activity)
 
     def prepare_activities(self, user, activity):
-        print("Preparing for activity: ", activity)
         start_date_time = self.data[user][activity][0]
         end_date_time = self.data[user][activity][1]
         transportation_mode = self.data[user][activity][2]
@@ -75,8 +75,8 @@ class DBInserter:
             "_id": activity,
             "user": user,
             "transportation_mode": transportation_mode,
-            "start_date_time": start_date_time,
-            "end_date_time": end_date_time
+            "start_date_time": datetime.strptime(start_date_time, '%Y-%m-%d %H:%M:%S'),
+            "end_date_time": datetime.strptime(end_date_time, '%Y-%m-%d %H:%M:%S')
         })
 
     def prepare_trackpoints(self, user, activity):
@@ -91,14 +91,13 @@ class DBInserter:
                 "lon": lon,
                 "altitude": altitude,
                 "date_days": date_days,
-                "date_time": date_time
+                "date_time": datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
 
             })
             self.trackpoint_id += 1
 
     def insert_data(self):
         self.prepare_data()
-        print("Prepared users: ", self.users)
         print("Prepared users count: ", len(self.users))
         print("Prepared activities count: ", len(self.activities))
         print("Prepared trackpoints count: ", len(self.trackpoints))
@@ -121,10 +120,4 @@ class DBInserter:
         print("Inserting trackpoints")
         collection = self.db["Trackpoint"]
         collection.insert_many(self.trackpoints)
-
-    def fetch_documents(self, collection_name):
-        collection = self.db[collection_name]
-        documents = collection.find({})
-        for doc in documents:
-            pprint(doc)
 
