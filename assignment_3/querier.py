@@ -3,6 +3,12 @@ from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine
 
+
+def print_result(documents):
+    for doc in documents:
+        pprint(doc)
+
+
 class DBQuerier:
 
     def __init__(self):
@@ -10,12 +16,10 @@ class DBQuerier:
         self.client = self.connection.client
         self.db = self.connection.db
 
-    
     def fetch_documents(self, collection_name):
         collection = self.db[collection_name]
         documents = collection.find({})
-        for doc in documents: 
-            pprint(doc)
+        print_result(documents)
 
     def q1(self):
         coll_user = self.db["User"]
@@ -47,5 +51,24 @@ class DBQuerier:
         ]
         documents = coll_act.aggregate(pipeline)
 
-        for doc in documents: 
-            pprint(doc)
+        print_result(documents)
+
+    def q5(self):
+        coll_act = self.db["Activity"]
+        pipeline = [
+            {"$match": {"transportation_mode": {"$ne": None}}},
+            {"$group": {"_id": "$transportation_mode", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        documents = coll_act.aggregate(pipeline)
+        print_result(documents)
+
+    def q7(self):
+        coll_act = self.db["Activity"]
+        coll_track = self.db["Trackpoint"]
+        pipeline = [
+            {"$match": {"user": "020", "transportation_mode": "'walk'"}},
+        ]
+        documents = coll_act.aggregate(pipeline)
+        print_result(documents)
+
