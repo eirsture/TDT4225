@@ -56,7 +56,7 @@ class DBQuerier:
         pipeline = [
             { "$group": { "_id": {"$year": "$start_date_time"}, "NumberOfActivities": { "$sum": 1 }}},
 		    { "$sort": { "NumberOfActivities": -1 } },
-            { "$limit": 20 }
+            { "$limit": 1 }
         ]
         documents = coll_act.aggregate(pipeline)
 
@@ -67,14 +67,12 @@ class DBQuerier:
         coll_act = self.db["Activity"]
 
         pipeline = [
-            {"$project": { "DifferenceInHours": {"$divide": [{"$subtract": ["$end_date_time", "$start_date_time"]}, 3600000]}}},
-            { "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": "DifferenceInHours" }}}
-            
-            #{"$group": {"_id": None, "diff": {"$subtract": ["$end_date_time", "$start_date_time"] }}}
-            #{ "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": 1 }}}
-		    #{ "$sort": { "recorded_hours": -1 } },
-            #{ "$limit": 20 }
+            {"$addFields": { "diff_hours": {"$divide": [{"$subtract": ["$end_date_time", "$start_date_time"]}, 3600000]}}},
+            { "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": "$diff_hours" }}},
+		    { "$sort": { "recorded_hours": -1 } },
+            { "$limit": 1 }
         ]
+
         documents = coll_act.aggregate(pipeline)
 
         for doc in documents: 
