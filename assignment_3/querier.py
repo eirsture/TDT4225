@@ -54,6 +54,17 @@ class DBQuerier:
         documents = coll_act.aggregate(pipeline)
 
         print_result(documents)
+        
+    def q4(self):
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$match": {"transportation_mode": {"$eq":"'taxi'"}}},
+            {"$group": {"_id":"$user"}},
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        print_result(documents)
 
     def q5(self):
         coll_act = self.db["Activity"]
@@ -67,8 +78,7 @@ class DBQuerier:
         print_result(documents)
 
     def q7(self):
-        # start_time = time.time()
-
+        start_time = time.time()
         coll_act = self.db["Activity"]
         pipeline = [
             {"$match": {
@@ -84,22 +94,18 @@ class DBQuerier:
                 "as": "trackpoints"
             }}
         ]
-
         documents = coll_act.aggregate(pipeline)
-
-        # fetch_time = time.time()
-        # print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
-
+        fetch_time = time.time()
+        print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
+        
         km = 0
-
         for activity in documents:
             trackpoints = activity["trackpoints"]
             for i in range(len(trackpoints)-1):
                 a = (trackpoints[i]["lat"], trackpoints[i]["lon"])
                 b = (trackpoints[i+1]["lat"], trackpoints[i+1]["lon"])
                 km += haversine(a, b)
-
-        # print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
+        print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
         print(f"7) Distance walked by user_id=112 in 2008: {km} km")
 
 
