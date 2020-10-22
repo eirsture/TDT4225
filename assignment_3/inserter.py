@@ -61,7 +61,7 @@ class DBInserter:
         for user in self.data:
             print("Preparing for user: ", user)
             has_labels = True if user in self.labels else False
-            self.users.append({"_id": user, "has_labels": has_labels})
+            self.users.append({"_id": int(user), "has_labels": has_labels})
 
             for activity in self.data[user]:
                 self.prepare_activities(user, activity)
@@ -73,7 +73,7 @@ class DBInserter:
         transportation_mode = self.data[user][activity][2]
         self.activities.append({
             "_id": activity,
-            "user": user,
+            "user": int(user),
             "transportation_mode": transportation_mode,
             "start_date_time": datetime.strptime(start_date_time, '%Y-%m-%d %H:%M:%S'),
             "end_date_time": datetime.strptime(end_date_time, '%Y-%m-%d %H:%M:%S')
@@ -87,10 +87,10 @@ class DBInserter:
             self.trackpoints.append({
                 "_id": self.trackpoint_id,
                 "activity_id": activity,
-                "lat": lat,
-                "lon": lon,
-                "altitude": altitude,
-                "date_days": date_days,
+                "lat": float(lat),
+                "lon": float(lon),
+                "altitude": float(altitude),
+                "date_days": float(date_days),
                 "date_time": datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
 
             })

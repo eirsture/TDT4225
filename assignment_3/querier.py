@@ -2,6 +2,14 @@ from db_connector import DbConnector
 from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine
+import time
+from datetime import datetime, timedelta
+
+
+def print_result(documents):
+    for doc in documents:
+        pprint(doc)
+
 
 class DBQuerier:
 
@@ -10,12 +18,10 @@ class DBQuerier:
         self.client = self.connection.client
         self.db = self.connection.db
 
-    
     def fetch_documents(self, collection_name):
         collection = self.db[collection_name]
         documents = collection.find({})
-        for doc in documents: 
-            pprint(doc)
+        print_result(documents)
 
     def q1(self):
         coll_user = self.db["User"]
@@ -47,9 +53,8 @@ class DBQuerier:
         ]
         documents = coll_act.aggregate(pipeline)
 
-        for doc in documents: 
-            pprint(doc)
-
+        print_result(documents)
+        
     def q4(self):
         coll_act = self.db["Activity"]
 
@@ -59,5 +64,48 @@ class DBQuerier:
         ]
         documents = coll_act.aggregate(pipeline)
 
-        for doc in documents:
-            pprint(doc)
+        print_result(documents)
+
+    def q5(self):
+        coll_act = self.db["Activity"]
+        pipeline = [
+            {"$match": {"transportation_mode": {"$ne": None}}},
+            {"$group": {"_id": "$transportation_mode", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        documents = coll_act.aggregate(pipeline)
+        print("5)")
+        print_result(documents)
+
+    def q7(self):
+        start_time = time.time()
+        coll_act = self.db["Activity"]
+        pipeline = [
+            {"$match": {
+                "user": 112,
+                "transportation_mode": "walk",
+                "start_date_time": {"$gte": datetime(year=2008, month=1, day=1)},
+                "end_date_time": {"$lte": datetime(year=2008, month=12, day=31)}
+            }},
+            {"$lookup": {
+                "from": "Trackpoint",
+                "localField": "_id",
+                "foreignField": "activity_id",
+                "as": "trackpoints"
+            }}
+        ]
+        documents = coll_act.aggregate(pipeline)
+        fetch_time = time.time()
+        print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
+        
+        km = 0
+        for activity in documents:
+            trackpoints = activity["trackpoints"]
+            for i in range(len(trackpoints)-1):
+                a = (trackpoints[i]["lat"], trackpoints[i]["lon"])
+                b = (trackpoints[i+1]["lat"], trackpoints[i+1]["lon"])
+                km += haversine(a, b)
+        print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
+        print(f"7) Distance walked by user_id=112 in 2008: {km} km")
+
+
