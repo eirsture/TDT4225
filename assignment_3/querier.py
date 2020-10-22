@@ -2,6 +2,8 @@ from db_connector import DbConnector
 from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine
+import time
+from datetime import datetime, timedelta
 
 
 def print_result(documents):
@@ -61,14 +63,43 @@ class DBQuerier:
             {"$sort": {"count": -1}}
         ]
         documents = coll_act.aggregate(pipeline)
+        print("5)")
         print_result(documents)
 
     def q7(self):
+        # start_time = time.time()
+
         coll_act = self.db["Activity"]
-        coll_track = self.db["Trackpoint"]
         pipeline = [
-            {"$match": {"user": "020", "transportation_mode": "'walk'"}},
+            {"$match": {
+                "user": 112,
+                "transportation_mode": "walk",
+                "start_date_time": {"$gte": datetime(year=2008, month=1, day=1)},
+                "end_date_time": {"$lte": datetime(year=2008, month=12, day=31)}
+            }},
+            {"$lookup": {
+                "from": "Trackpoint",
+                "localField": "_id",
+                "foreignField": "activity_id",
+                "as": "trackpoints"
+            }}
         ]
+
         documents = coll_act.aggregate(pipeline)
-        print_result(documents)
+
+        # fetch_time = time.time()
+        # print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
+
+        km = 0
+
+        for activity in documents:
+            trackpoints = activity["trackpoints"]
+            for i in range(len(trackpoints)-1):
+                a = (trackpoints[i]["lat"], trackpoints[i]["lon"])
+                b = (trackpoints[i+1]["lat"], trackpoints[i+1]["lon"])
+                km += haversine(a, b)
+
+        # print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
+        print(f"7) Distance walked by user_id=112 in 2008: {km} km")
+
 
