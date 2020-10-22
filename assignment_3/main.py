@@ -8,7 +8,10 @@ def main():
 
     try:
         program = DBQuerier()
-        program.q6b()
+        # program.q1()
+        # program.q2()
+        # program.q3()
+        # program.q4()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
