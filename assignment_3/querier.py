@@ -2,6 +2,7 @@ from db_connector import DbConnector
 from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine
+from datetime import datetime
 
 
 class DBQuerier:
@@ -64,38 +65,40 @@ class DBQuerier:
         print("\n4) Users who have taken a taxi:")
         pprint(documents)
 
+    # 9. Find all users who have invalid activities, and the number of invalid activities per user
+    # ○ An invalid activity is defined as an activity with consecutive trackpoints where the timestamps deviate with
+    #   at least 5 minutes.
+
     def q9(self):
         coll_tp = self.db["Trackpoint"]
-        docs = coll_tp.find()
-        for doc in docs:
-            pprint(doc)
+        print("Querying all trackpoints (may take a while)...")
+        trackpoints = list(coll_tp.find())
+        comparing_trackpoints = trackpoints[1:]
+        print("Finding time stamp deviations for trackpoints...")
+        time_diff_trackpoints = list(map(
+            lambda x, y: (x['activity_id'],
+                          (x['date_time'] - y['date_time'] if x['activity_id'] == y['activity_id']
+                           else x['date_time'] - x['date_time'])  # first trackpoint time diff for an activity set to 0
+                          .total_seconds()), comparing_trackpoints, trackpoints))
 
+        invalid_trackpoints = list(filter(lambda x: x[1] >= 300, time_diff_trackpoints))
+        print("Finding invalid activities with trackpoint time stamp deviations > 5 minutes...")
+        invalid_activities = set()
+        for trackpoint in invalid_trackpoints:
+            activity_id = trackpoint[0]
+            invalid_activities.add(activity_id)
 
-        # comparing_trackpoints = trackpoints[1:]
-        #
-        # print("Finding time stamp deviations for trackpoints...")
-        # time_diff_trackpoints = list(map(
-        #     lambda x, y: (x[0], x[1], (x[2] - y[2]).total_seconds()), comparing_trackpoints, trackpoints))
-        #
-        # invalid_trackpoints = list(filter(lambda x: x[2] >= 300, time_diff_trackpoints))
-        #
-        # print("Finding invalid activities with trackpoint time stamp deviations > 5 minutes...")
-        # invalid_activities = set()
-        # for trackpoint in invalid_trackpoints:
-        #     activity_id = trackpoint[1]
-        #     invalid_activities.add(activity_id)
-        #
-        # print("Finding users associated with the invalid activities...")
-        # users = {}
-        # for activity in invalid_activities:
-        #     user_query = "SELECT a.user_id FROM Activities a WHERE a.id = {}".format(activity)
-        #     self.cursor.execute(user_query)
-        #     user = self.cursor.fetchone()[0]
-        #     if user not in users:
-        #         users[user] = 1
-        #     else:
-        #         users[user] += 1
-        #
-        # users_pretty = list(users.items())
-        # print("\n9)All users who have invalid activities, and the number of invalid activities per user")
-        # print(tabulate(users_pretty, headers=("user id", "invalid activities")))
+        print("Finding users associated with the invalid activities...")
+        users = {}
+        coll_act = self.db["Activity"]
+        for activity_id in invalid_activities:
+            activity = coll_act.find_one({'_id': activity_id})
+            user = activity['user']
+            if user not in users:
+                users[user] = 1
+            else:
+                users[user] += 1
+
+        users_pretty = list(users.items())
+        print("\n9)All users who have invalid activities, and the number of invalid activities per user")
+        print(tabulate(users_pretty, headers=("user id", "invalid activities")))
