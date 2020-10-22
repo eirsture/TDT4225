@@ -18,6 +18,8 @@ class DBQuerier:
             pprint(doc)
 
     def q1(self):
+        print("1)")
+
         coll_user = self.db["User"]
         print("Number of users: ", coll_user.count())
 
@@ -28,6 +30,7 @@ class DBQuerier:
         print("Number of trackpoints: ", coll_tp.count())
 
     def q2(self):
+        print("2)")
         coll_user = self.db["User"]
 
         coll_act = self.db["Activity"]
@@ -38,6 +41,7 @@ class DBQuerier:
         print("Average number of activities pr user: ", averageNumActivites)
 
     def q3(self): 
+        print("3)")
         coll_act = self.db["Activity"]
 
         pipeline = [
@@ -51,6 +55,7 @@ class DBQuerier:
             pprint(doc)
 
     def q6a(self):
+        print("6 a)")
         coll_act = self.db["Activity"]
 
         pipeline = [
@@ -64,6 +69,7 @@ class DBQuerier:
             pprint(doc)
 
     def q6b(self):
+        print("6 b)")
         coll_act = self.db["Activity"]
 
         pipeline = [
