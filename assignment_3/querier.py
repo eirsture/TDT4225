@@ -23,6 +23,24 @@ class DBQuerier:
         documents = collection.find({})
         print_result(documents)
 
+    def part1(self):
+        print("First 10 users:")
+        coll_user = self.db["User"]
+        usr = coll_user.find({}).limit(10)
+        print(tabulate(usr, headers="keys"))
+        print("\n\n")
+
+        print("First 10 activities:")
+        coll_act = self.db["Activity"]
+        act = coll_act.find({}).limit(10)
+        print(tabulate(act, headers="keys"))
+        print("\n\n")
+
+        print("First 10 trackpoints:")
+        coll_tp = self.db["Trackpoint"]
+        tp = coll_tp.find({}).limit(10)
+        print(tabulate(tp, headers="keys"))
+
     def q1(self):
         coll_user = self.db["User"]
         print("Number of users: ", coll_user.count())
@@ -54,7 +72,7 @@ class DBQuerier:
         documents = coll_act.aggregate(pipeline)
 
         print_result(documents)
-        
+
     def q4(self):
         coll_act = self.db["Activity"]
 
@@ -97,7 +115,7 @@ class DBQuerier:
         documents = coll_act.aggregate(pipeline)
         fetch_time = time.time()
         print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
-        
+
         km = 0
         for activity in documents:
             trackpoints = activity["trackpoints"]
