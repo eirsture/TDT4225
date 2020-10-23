@@ -108,4 +108,90 @@ class DBQuerier:
         print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
         print(f"7) Distance walked by user_id=112 in 2008: {km} km")
 
+    def q8(self):
+        coll_tp = self.db["Trackpoint"]
 
+        pipeline=[
+            {
+            "$match": 
+                {'altitude': {'$ne': '-777'}}
+                        
+            },
+            {"$lookup": {
+                "from": "Activity",
+                "localField": "activity_id",
+                "foreignField": "_id",
+                "as": "activity"
+                }
+            },
+            {"$project": {
+                "_id": 0,
+                "altitude": 1,
+                "user": "$activity.user"
+                }
+            }
+        ]
+
+        documents = coll_tp.aggregate(pipeline)
+
+        total_altitude_gained = 0
+        count = 0
+        curr_user = 0
+
+        altitude_list = []
+
+        for doc in documents:
+            if(doc["user"][0] != curr_user):
+                altitude_list.append({"user": curr_user, "alt": total_altitude_gained})
+                curr_user = doc["user"][0]
+                total_altitude_gained = 0
+                count = 0
+            if count > 0:
+                if doc["altitude"] > last_doc["altitude"]:
+                    total_altitude_gained += doc["altitude"] - last_doc["altitude"]
+            count += 1
+            last_doc = doc
+        altitude_list.append({"user": curr_user, "alt": total_altitude_gained * 0.3048})
+
+        top_20 = sorted(altitude_list, key = lambda i: i["altitude"])[-20:]
+        top_20.reverse()
+        print("8) Top 20 users who have gained the most altitude meters: ")
+        pprint(top_20)
+
+
+def q10(self): 
+    coll_tp = self.db["Trackpoint"]
+
+    pipeline=[ 
+        {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {"$eq": [{"$round": ["$lat", 3]}, 39.916]},
+                    {"$eq": [{"$round": ["$lon", 3]}, 116.397]}
+                    ]
+                }
+            }
+        },
+        {"$lookup": {
+            "from": "Activity",
+            "localField": "activity_id",
+            "foreignField": "_id",
+            "as": "activity"
+            }
+        },
+        {
+            "$unwind": "$activity"
+        },
+        {
+            "$group":
+                {
+                    "_id": "$activity.user"
+                }
+        },
+    ]
+
+    documents = coll_tp.aggregate(pipeline)
+
+    print("10) Users who have been in the forbidden city: ")
+    print_result(documents)

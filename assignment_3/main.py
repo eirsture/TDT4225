@@ -12,6 +12,8 @@ def main():
         # program.q2()
         # program.q3()
         # program.q4()
+        # program.q8()
+        # program.q10()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
