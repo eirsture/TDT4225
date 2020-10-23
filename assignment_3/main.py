@@ -9,10 +9,13 @@ def main():
 
     try:
         program = DBQuerier()
+        # program.part1()
         # program.q1()
         # program.q2()
         # program.q3()
         # program.q4()
+        # program.q5()
+        # program.q7()
         # program.q9()
         # program.q11()
 

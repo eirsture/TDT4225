@@ -2,7 +2,13 @@ from db_connector import DbConnector
 from tabulate import tabulate
 from pprint import pprint
 from haversine import haversine
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
+
+
+def print_result(documents):
+    for doc in documents:
+        pprint(doc)
 
 
 class DBQuerier:
@@ -15,8 +21,25 @@ class DBQuerier:
     def fetch_documents(self, collection_name):
         collection = self.db[collection_name]
         documents = collection.find({})
-        for doc in documents:
-            pprint(doc)
+        print_result(documents)
+
+    def part1(self):
+        print("First 10 users:")
+        coll_user = self.db["User"]
+        usr = coll_user.find({}).limit(10)
+        print(tabulate(usr, headers="keys"))
+        print("\n\n")
+
+        print("First 10 activities:")
+        coll_act = self.db["Activity"]
+        act = coll_act.find({}).limit(10)
+        print(tabulate(act, headers="keys"))
+        print("\n\n")
+
+        print("First 10 trackpoints:")
+        coll_tp = self.db["Trackpoint"]
+        tp = coll_tp.find({}).limit(10)
+        print(tabulate(tp, headers="keys"))
 
     def q1(self):
         coll_user = self.db["User"]
@@ -48,7 +71,6 @@ class DBQuerier:
             {"$limit": 20}
         ]
         documents = list(coll_act.aggregate(pipeline))
-
         print("\n3) Top 20 users with highest number of activities:")
         pprint(documents)
 
@@ -61,9 +83,51 @@ class DBQuerier:
             {"$sort": {"_id": 1}},
         ]
         documents = list(coll_act.aggregate(pipeline))
-
         print("\n4) Users who have taken a taxi:")
         pprint(documents)
+
+    def q5(self):
+        coll_act = self.db["Activity"]
+        pipeline = [
+            {"$match": {"transportation_mode": {"$ne": None}}},
+            {"$group": {"_id": "$transportation_mode", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        documents = coll_act.aggregate(pipeline)
+        print("5)")
+        print_result(documents)
+
+    def q7(self):
+        start_time = time.time()
+        coll_act = self.db["Activity"]
+        pipeline = [
+            {"$match": {
+                "user": 112,
+                "transportation_mode": "walk",
+                "start_date_time": {"$gte": datetime(year=2008, month=1, day=1)},
+                "end_date_time": {"$lte": datetime(year=2008, month=12, day=31)}
+            }},
+            {"$lookup": {
+                "from": "Trackpoint",
+                "localField": "_id",
+                "foreignField": "activity_id",
+                "as": "trackpoints"
+            }}
+        ]
+        documents = coll_act.aggregate(pipeline)
+        fetch_time = time.time()
+        print(f'Time to fetch from database: {str(timedelta(seconds=(fetch_time - start_time)))}')
+
+        km = 0
+        for activity in documents:
+            trackpoints = activity["trackpoints"]
+            for i in range(len(trackpoints) - 1):
+                a = (trackpoints[i]["lat"], trackpoints[i]["lon"])
+                b = (trackpoints[i + 1]["lat"], trackpoints[i + 1]["lon"])
+                km += haversine(a, b)
+        print(f'Time to calculate total distance: {str(timedelta(seconds=(time.time() - fetch_time)))}')
+        print(f"7) Distance walked by user_id=112 in 2008: {km} km")
+
 
     # 9. Find all users who have invalid activities, and the number of invalid activities per user
     # ○ An invalid activity is defined as an activity with consecutive trackpoints where the timestamps deviate with
