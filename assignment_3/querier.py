@@ -97,6 +97,37 @@ class DBQuerier:
         print("5)")
         print_result(documents)
 
+    def q6a(self):
+        print("6 a)")
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$group": {"_id": {"$year": "$start_date_time"}, "NumberOfActivities": {"$sum": 1}}},
+            {"$sort": {"NumberOfActivities": -1}},
+            {"$limit": 1}
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents:
+            pprint(doc)
+
+    def q6b(self):
+        print("6 b)")
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$addFields": {
+                "diff_hours": {"$divide": [{"$subtract": ["$end_date_time", "$start_date_time"]}, 3600000]}}},
+            {"$group": {"_id": {"$year": "$start_date_time"}, "recorded_hours": {"$sum": "$diff_hours"}}},
+            {"$sort": {"recorded_hours": -1}},
+            {"$limit": 1}
+        ]
+
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents:
+            pprint(doc)
+
     def q7(self):
         start_time = time.time()
         coll_act = self.db["Activity"]
