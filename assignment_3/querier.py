@@ -42,6 +42,8 @@ class DBQuerier:
         print(tabulate(tp, headers="keys"))
 
     def q1(self):
+        print("1)")
+
         coll_user = self.db["User"]
         print("Number of users: ", coll_user.count())
 
@@ -52,6 +54,7 @@ class DBQuerier:
         print("Number of trackpoints: ", coll_tp.count())
 
     def q2(self):
+        print("2)")
         coll_user = self.db["User"]
 
         coll_act = self.db["Activity"]
@@ -62,6 +65,7 @@ class DBQuerier:
         print("Average number of activities pr user: ", averageNumActivites)
 
     def q3(self): 
+        print("3)")
         coll_act = self.db["Activity"]
 
         pipeline = [
@@ -71,6 +75,40 @@ class DBQuerier:
         ]
         documents = coll_act.aggregate(pipeline)
 
+<<<<<<< HEAD
+        for doc in documents: 
+            pprint(doc)
+
+    def q6a(self):
+        print("6 a)")
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            { "$group": { "_id": {"$year": "$start_date_time"}, "NumberOfActivities": { "$sum": 1 }}},
+		    { "$sort": { "NumberOfActivities": -1 } },
+            { "$limit": 1 }
+        ]
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents: 
+            pprint(doc)
+
+    def q6b(self):
+        print("6 b)")
+        coll_act = self.db["Activity"]
+
+        pipeline = [
+            {"$addFields": { "diff_hours": {"$divide": [{"$subtract": ["$end_date_time", "$start_date_time"]}, 3600000]}}},
+            { "$group": { "_id": {"$year": "$start_date_time"}, "recorded_hours": { "$sum": "$diff_hours" }}},
+		    { "$sort": { "recorded_hours": -1 } },
+            { "$limit": 1 }
+        ]
+
+        documents = coll_act.aggregate(pipeline)
+
+        for doc in documents: 
+            pprint(doc)
+=======
         print_result(documents)
 
     def q4(self):
@@ -127,3 +165,4 @@ class DBQuerier:
         print(f"7) Distance walked by user_id=112 in 2008: {km} km")
 
 
+>>>>>>> origin/dev
