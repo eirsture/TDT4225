@@ -102,3 +102,41 @@ class DBQuerier:
         users_pretty = list(users.items())
         print("\n9)All users who have invalid activities, and the number of invalid activities per user")
         print(tabulate(users_pretty, headers=("user id", "invalid activities")))
+
+    """
+        11. Find all users who have registered transportation_mode and their most used transportation_mode. 
+            ○ The answer should be on format(user_id, most_used_transportation_mode) sorted on user_id. 
+            ○ Some users may have the same number of activities tagged with e.g.walk and car.
+                In this case it is up to you to decide which transportation mode to include in your answer(choose one). 
+            ○ Do not count the rows where the mode is null.
+    """
+
+    def q11(self):
+        coll_act = self.db["Activity"]
+        query = {"transportation_mode": {"$ne": None}}
+        labeled_activities = list(coll_act.find(query))
+
+        data = {}
+        for activity in labeled_activities:
+            user_id = activity['user']
+            transportation_mode = activity['transportation_mode']
+            if user_id not in data:
+                data[user_id] = {}
+            if transportation_mode not in data[user_id]:
+                data[user_id][transportation_mode] = 1
+            else:
+                data[user_id][transportation_mode] += 1
+
+        data_pretty = []
+        for user in data:
+            most_used_transportation_mode = None
+            max_times_used = -1
+            for transportation_mode in data[user]:
+                times_used = data[user][transportation_mode]
+                if times_used > max_times_used:
+                    max_times_used = times_used
+                    most_used_transportation_mode = transportation_mode
+            data_pretty.append((user, most_used_transportation_mode))
+
+        print("\n11) All users who have registered transportation_mode and their most used transportation_mode.")
+        print(tabulate(data_pretty, headers=("user id", "most used transportation")))
