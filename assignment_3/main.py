@@ -3,6 +3,7 @@ from fetcher import Fetcher
 from inserter import DBInserter
 from querier import DBQuerier
 
+
 def main():
     program = None
 
@@ -14,8 +15,11 @@ def main():
         # program.q3()
         # program.q4()
         # program.q5()
+        # program.q6a()
+        # program.q6b()
         # program.q7()
-
+        # program.q9()
+        # program.q11()
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
