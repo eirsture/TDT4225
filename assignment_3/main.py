@@ -18,7 +18,9 @@ def main():
         # program.q6a()
         # program.q6b()
         # program.q7()
+        # program.q8()
         # program.q9()
+        # program.q10()
         # program.q11()
 
     except Exception as e:
